@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>RNT Token System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>RNT Token System</h1>
+    <button id="connectBtn">Connect Wallet</button>
+    <p id="status">Status: Disconnected</p>
+    <p id="balance">Balance: - RNT</p>
+
+    <div class="form-group">
+      <input type="text" id="toAddr" placeholder="Recipient (0x...)">
+    </div>
+    <div class="form-group">
+      <input type="number" id="amount" placeholder="Amount">
+    </div>
+    <button id="sendBtn" disabled>Send RNT</button>
+    <div id="gasInfo" class="info-box">
+      <p id="gasEstimate">Estimated Gas: -</p>
+      <p id="gasStatus"></p>
+    </div>
+  </div>
+
+  <script type="module" src="ui.js"></script>
+</body>
+
+</html>
