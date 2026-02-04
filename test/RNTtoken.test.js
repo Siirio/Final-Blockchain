@@ -59,13 +59,13 @@ describe("RNTtoken Unit Tests", function () {
     it("Should fail when sender does not have enough balance", async function () {
       const amount = ethers.utils.parseUnits("1001", 18);
       await expect(token.transfer(addr1.address, amount))
-        .to.be.revertedWith("Insufficient balance");
+        .to.be.revertedWithCustomError(token, "ERC20InsufficientBalance");
     });
 
     it("Should fail when transferring from an account with zero balance", async function () {
       const amount = ethers.utils.parseUnits("1", 18);
       await expect(token.connect(addr1).transfer(addr2.address, amount))
-        .to.be.revertedWith("Insufficient balance");
+        .to.be.revertedWithCustomError(token, "ERC20InsufficientBalance");
     });
   });
 
