@@ -3,34 +3,129 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>RNT Token System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RNT CORP // ARCHITECTURE</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Ethers.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </head>
-<!-- front of rnt token-->
 
 <body>
-  <div class="container">
-    <h1>RNT Token System</h1>
-    <button id="connectBtn">Connect Wallet</button>
-    <p id="status">Status: Disconnected</p>
-    <p id="balance">Balance: - RNT</p>
+  <div class="structural-line line-v" style="left: 20%"></div>
+  <div class="structural-line line-v" style="left: 80%"></div>
+  <div class="structural-line line-h" style="top: 15%"></div>
 
-    <div class="form-group">
-      <input type="text" id="toAddr" placeholder="Recipient (0x...)">
+  <nav class="navbar">
+    <div class="logo">RNT <span>CORP</span></div>
+    <div class="nav-right">
+      <div id="networkStatus" class="network-badge">SYSTEM OFFLINE</div>
+      <button id="connectBtn" class="btn-glass">INITIATE PROTOCOL</button>
     </div>
-    <div class="form-group">
-      <input type="number" id="amount" placeholder="Amount">
-    </div>
-    <button id="sendBtn" disabled>Send RNT</button>
-    <div id="gasInfo" class="info-box">
-      <p id="gasEstimate">Estimated Gas: -</p>
-      <p id="gasStatus"></p>
+  </nav>
+
+  <main class="app-wrapper">
+    <!-- Sidebar System Info -->
+    <aside class="sidebar">
+      <div class="corp-info">
+        <h1>Data Infrastructure</h1>
+        <p style="font-size: 0.7rem; color: var(--text-muted); line-height: 1.6;">
+          Architectural protocol for decentralized capital coordination. <br>
+          Proprietary of RNT Corp // 2026.
+        </p>
+      </div>
+
+      <div class="user-status">
+        <div class="address-block" id="userAddress">DISCONNECTED // 0x...</div>
+
+        <div class="balance-item">
+          <label>RNT ASSETS</label>
+          <div class="value" id="rntBalance">0.00</div>
+        </div>
+
+        <div class="balance-item">
+          <label>ETH LIQUIDITY</label>
+          <div class="value" id="ethBalance">0.00</div>
+        </div>
+      </div>
+
+      <ul class="nav-menu nav-links">
+        <li class="active" data-section="token-section">Assets Transfer</li>
+        <li data-section="crowd-section">Capital Campaigns</li>
+      </ul>
+    </aside>
+
+    <!-- Main Workspace -->
+    <section class="content-area">
+
+      <!-- Asset Transfer Section -->
+      <div id="token-section" class="section active">
+        <div class="section-header">
+          <h2>Asset // Transfer</h2>
+        </div>
+
+        <div class="brutalist-card">
+          <div class="input-container">
+            <label>Target Address (Registry)</label>
+            <input type="text" id="transferTo" placeholder="0x0000000000000000000000000000000000000000">
+          </div>
+
+          <div class="input-container">
+            <label>Allocation Magnitude (RNT)</label>
+            <input type="number" id="transferAmount" placeholder="0.00">
+          </div>
+
+          <button id="transferBtn" class="btn-glass w-100">EXECUTE ALLOCATION</button>
+        </div>
+      </div>
+
+      <!-- Crowdfunding Section -->
+      <div id="crowd-section" class="section">
+        <div class="section-header">
+          <h2>Capital // Campaigns</h2>
+          <button id="openCreateModal" class="btn-glass" style="font-size: 0.6rem;">DEPLOY NEW NODE</button>
+        </div>
+
+        <div id="campaignList" class="campaign-grid">
+          <div class="loader">SYNCHRONIZING REPOSITORY...</div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Project Deployment Modal -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Node // Setup</h3>
+        <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem;">CONFIGURE ARCHITECTURAL
+          PARAMETERS</p>
+      </div>
+
+      <div class="input-container">
+        <label>Campaign Denomination</label>
+        <input type="text" id="newTitle" placeholder="NODE NAME">
+      </div>
+
+      <div class="input-container">
+        <label>Required Capital (ETH)</label>
+        <input type="number" id="newGoal" placeholder="1.00">
+      </div>
+
+      <div class="input-container">
+        <label>Operational Window (MIN)</label>
+        <input type="number" id="newDuration" placeholder="60">
+      </div>
+
+      <button id="createCampaignBtn" class="btn-glass btn-primary w-100">COMMENCE DEPLOYMENT</button>
+      <button id="closeModal" class="btn-glass w-100 mt-2">ABORT</button>
     </div>
   </div>
 
+  <!-- System Feedback -->
+  <div id="toast" class="toast">SYSTEM_READY //</div>
+
   <script type="module" src="ui.js"></script>
 </body>
-
 
 </html>
