@@ -1,84 +1,135 @@
-export class RNTService {
-    constructor(contractAddress, abi) {
-        this.contractAddress = contractAddress;
-        this.abi = abi;
+export class BlockchainService {
+    constructor(tokenAddr, tokenAbi, crowdAddr, crowdAbi) {
+        this.tokenAddr = tokenAddr;
+        this.tokenAbi = tokenAbi;
+        this.crowdAddr = crowdAddr;
+        this.crowdAbi = crowdAbi;
         this.provider = null;
         this.signer = null;
-        this.contract = null;
+        this.tokenContract = null;
+        this.crowdContract = null;
+
+        // Supported Networks
+        this.supportedNetworks = {
+            11155111: "Sepolia",
+            17000: "Holesky",
+            31337: "Hardhat Local"
+        };
     }
 
     async init() {
         if (typeof window === 'undefined' || !window.ethereum) {
-            throw new Error("Web3 provider not found. Please install MetaMask.");
-        }
-        if (typeof ethers === 'undefined') {
-            throw new Error("Ethers.js library not loaded.");
+            throw new Error("MetaMask is not installed.");
         }
         this.provider = new ethers.providers.Web3Provider(window.ethereum);
     }
 
     async connect() {
         if (!this.provider) await this.init();
-        await this.provider.send("eth_requestAccounts", []);
+
+        // Network Validation
+        const network = await this.provider.getNetwork();
+        if (!this.supportedNetworks[network.chainId]) {
+            throw new Error(`Unsupported Network (ChainID: ${network.chainId}). Please switch to Sepolia, Holesky, or Local.`);
+        }
+
+        const accounts = await this.provider.send("eth_requestAccounts", []);
         this.signer = this.provider.getSigner();
-        this.contract = new ethers.Contract(this.contractAddress, this.abi, this.signer);
-        return await this.signer.getAddress();
+        this.tokenContract = new ethers.Contract(this.tokenAddr, this.tokenAbi, this.signer);
+        this.crowdContract = new ethers.Contract(this.crowdAddr, this.crowdAbi, this.signer);
+
+        return {
+            address: accounts[0],
+            networkName: this.supportedNetworks[network.chainId],
+            explorerUrl: this.getExplorerUrl(network.chainId)
+        };
     }
 
-    async sendTokens(to, amount) {
-        try {
-            if (!this.contract) throw new Error("Contract not initialized. Connect wallet first.");
-            if (!ethers.utils.isAddress(to)) {
-                throw new Error("Invalid recipient address");
-            }
-            const amountInWei = ethers.utils.parseEther(amount.toString());
-            const tx = await this.contract.transfer(to, amountInWei);
-            return await tx.wait();
-        } catch (error) {
-            console.error("Transaction failed:", error);
-            throw error;
-        }
+    getExplorerUrl(chainId) {
+        if (chainId === 11155111) return "https://sepolia.etherscan.io";
+        if (chainId === 17000) return "https://holesky.etherscan.io";
+        return ""; // Local
     }
 
-    async getBalance(address) {
-        try {
-            if (!this.contract) throw new Error("Contract not initialized.");
-            const balance = await this.contract.balanceOf(address);
-            return ethers.utils.formatEther(balance);
-        } catch (error) {
-            console.error("Failed to fetch balance:", error);
-            throw error;
-        }
+    // --- Token Methods ---
+    async getTokenBalance(address) {
+        if (!this.tokenContract) throw new Error("Not connected");
+        const balance = await this.tokenContract.balanceOf(address);
+        return ethers.utils.formatEther(balance);
     }
 
-    async onTransfer(callback) {
-        if (!this.contract) return;
-        this.contract.on("Transfer", (from, to, value) => {
-            callback(from, to, ethers.utils.formatEther(value));
+    async transferTokens(to, amount) {
+        if (!this.tokenContract) throw new Error("Not connected");
+        const tx = await this.tokenContract.transfer(to, ethers.utils.parseEther(amount.toString()));
+        return tx;
+    }
+
+    // --- Crowdfunding Methods ---
+    async getCampaignCount() {
+        if (!this.crowdContract) throw new Error("Not connected");
+        const count = await this.crowdContract.campaignCount();
+        return count.toNumber();
+    }
+
+    async getCampaign(id) {
+        if (!this.crowdContract) throw new Error("Not connected");
+        const c = await this.crowdContract.getCampaign(id);
+        return {
+            id: c.id.toNumber(),
+            title: c.title,
+            goal: ethers.utils.formatEther(c.goal),
+            deadline: c.deadline.toNumber(),
+            creator: c.creator,
+            totalRaised: ethers.utils.formatEther(c.totalRaised),
+            finalized: c.finalized
+        };
+    }
+
+    async createCampaign(title, goalEth, durationSeconds) {
+        if (!this.crowdContract) throw new Error("Not connected");
+        const goalWei = ethers.utils.parseEther(goalEth.toString());
+        const tx = await this.crowdContract.createCampaign(title, goalWei, durationSeconds);
+        return tx;
+    }
+
+    async contribute(campaignId, amountEth) {
+        if (!this.crowdContract) throw new Error("Not connected");
+        const tx = await this.crowdContract.contribute(campaignId, {
+            value: ethers.utils.parseEther(amountEth.toString())
+        });
+        return tx;
+    }
+
+    async finalizeCampaign(campaignId) {
+        if (!this.crowdContract) throw new Error("Not connected");
+        const tx = await this.crowdContract.finalizeCampaign(campaignId);
+        return tx;
+    }
+
+    // --- Listeners ---
+    setupListeners(onContribution, onTransfer) {
+        if (!this.crowdContract || !this.tokenContract) return;
+
+        this.crowdContract.on("ContributionMade", (id, contributor, amount) => {
+            onContribution(id.toNumber(), contributor, ethers.utils.formatEther(amount));
+        });
+
+        this.tokenContract.on("Transfer", (from, to, amount) => {
+            onTransfer(from, to, ethers.utils.formatEther(amount));
         });
     }
 
-    async estimateGas(to, amount) {
-        if (!this.contract) throw new Error("Contract not initialized.");
+    async estimateGas(method, ...args) {
+        if (!this.signer) throw new Error("Not connected");
+        let contract = (method === 'transfer') ? this.tokenContract : this.crowdContract;
         try {
-            const amountInWei = ethers.utils.parseEther(amount.toString());
-            const estimate = await this.contract.estimateGas.transfer(to, amountInWei);
-            return estimate.toString();
-        } catch (error) {
-            throw error;
-        }
+            const estimate = await contract.estimateGas[method](...args);
+            return estimate.toNumber();
+        } catch (error) { return "N/A"; }
     }
 
-    async estimateFailingGas(to, amount) {
-        if (!this.contract) throw new Error("Contract not initialized.");
-        try {
-            const amountInWei = ethers.utils.parseEther(amount.toString());
-            await this.contract.estimateGas.transfer(to, amountInWei);
-        } catch (error) {
-            if (error.error && error.error.data) {
-                return "Fail detected: " + error.error.message;
-            }
-            return error.message;
-        }
+    async getGasPrice() {
+        const price = await this.provider.getGasPrice();
+        return ethers.utils.formatUnits(price, "gwei");
     }
 }
