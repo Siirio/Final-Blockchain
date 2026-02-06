@@ -1,11 +1,28 @@
-export const ADDR = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-export const ABI = [
-  "constructor(uint256 _initialSupply)",
-  "event Transfer(address indexed from, address indexed to, uint256 value)",
-  "function balanceOf(address) view returns (uint256) @29000000",
-  "function decimals() view returns (uint8) @29000000",
-  "function name() view returns (string) @29000000",
-  "function symbol() view returns (string) @29000000",
-  "function totalSupply() view returns (uint256) @29000000",
-  "function transfer(address _to, uint256 _value) returns (bool success) @29000000"
+export const TOKEN_ADDR = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+export const CROWDFUNDING_ADDR = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+
+export const TOKEN_ABI = [
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
+  "function totalSupply() view returns (uint256)",
+  "function balanceOf(address) view returns (uint256)",
+  "function transfer(address, uint256) returns (bool)",
+  "function allowance(address, address) view returns (uint256)",
+  "function approve(address, uint256) returns (bool)",
+  "function transferFrom(address, address, uint256) returns (bool)",
+  "event Transfer(address indexed from, address indexed to, uint256 value)"
+];
+
+export const CROWDFUNDING_ABI = [
+  "function campaignCount() view returns (uint256)",
+  "function campaigns(uint256) view returns (uint256 id, string title, uint256 goal, uint256 deadline, address creator, uint256 totalRaised, bool finalized)",
+  "function createCampaign(string title, uint256 goal, uint256 duration)",
+  "function contribute(uint256 campaignId) payable",
+  "function finalizeCampaign(uint256 campaignId)",
+  "function getCampaign(uint256 campaignId) view returns (uint256 id, string title, uint256 goal, uint256 deadline, address creator, uint256 totalRaised, bool finalized)",
+  "function contributions(uint256 campaignId, address contributor) view returns (uint256)",
+  "event CampaignCreated(uint256 id, string title, uint256 goal, uint256 deadline, address creator)",
+  "event ContributionMade(uint256 campaignId, address contributor, uint256 amount)",
+  "event CampaignFinalized(uint256 campaignId, uint256 totalRaised)"
 ];
