@@ -7,7 +7,7 @@ class UIManager {
         this.connectBtn = document.getElementById('connectBtn');
         this.sendBtn = document.getElementById('sendBtn');
         this.statusEl = document.getElementById('status');
-        this.balanceEl = document.getElementById('balance');
+        this.balanceEl = document.getElementById('balanceValue');
         this.toAddrInput = document.getElementById('toAddr');
         this.amountInput = document.getElementById('amount');
         this.gasEstimateEl = document.getElementById('gasEstimate');
@@ -44,7 +44,7 @@ class UIManager {
         try {
             const balance = await this.rnt.getBalance(this.userAddress);
             if (this.balanceEl) {
-                this.balanceEl.innerText = `Balance: ${balance} RNT`;
+                this.balanceEl.innerText = `${balance} RNT`;
             }
         } catch (err) {
             console.error(err);
@@ -62,9 +62,8 @@ class UIManager {
             this.gasStatusEl.innerText = "Transaction looks valid";
             this.gasStatusEl.style.color = "#44ff44";
         } catch (err) {
-            const failMsg = await this.rnt.estimateFailingGas(to, amt);
             this.gasEstimateEl.innerText = "Estimated Gas: -";
-            this.gasStatusEl.innerText = failMsg;
+            this.gasStatusEl.innerText = `Error: ${err.message}`;
             this.gasStatusEl.style.color = "#ff4444";
         }
     }
@@ -72,7 +71,19 @@ class UIManager {
     async handleConnect() {
         try {
             this.updateStatus("Connecting...");
-            this.userAddress = await this.rnt.connect();
+            const connResult = await this.rnt.connect();
+            this.userAddress = connResult.address;
+            
+            const networkBadge = document.getElementById('networkBadge');
+            if (networkBadge) {
+                networkBadge.innerText = `NETWORK: ${connResult.networkName}`;
+            }
+            
+            const addressBlock = document.getElementById('addressBlock');
+            if (addressBlock) {
+                addressBlock.innerText = `Address: ${this.userAddress.substring(0, 6)}...${this.userAddress.substring(38)}`;
+            }
+            
             this.updateStatus(`Connected: ${this.userAddress}`);
             await this.refreshBalance();
             this.rnt.onTransfer((from, to, value) => {

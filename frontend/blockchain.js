@@ -1,84 +1,113 @@
 export class RNTService {
-    constructor(contractAddress, abi) {
-        this.contractAddress = contractAddress;
-        this.abi = abi;
-        this.provider = null;
-        this.signer = null;
-        this.contract = null;
+  constructor(tokenAddr, tokenAbi, crowdAddr, crowdAbi) {
+    this.tokenAddr = tokenAddr;
+    this.tokenAbi = tokenAbi;
+    this.crowdAddr = crowdAddr;
+    this.crowdAbi = crowdAbi;
+
+    this.provider = null;
+    this.signer = null;
+    this.tokenContract = null;
+    this.crowdContract = null;
+
+    this.supportedNetworks = {
+      11155111: "Sepolia",
+      17000: "Holesky",
+      31337: "Hardhat Local"
+    };
+  }
+
+  async init() {
+    if (typeof window === "undefined" || !window.ethereum) {
+      throw new Error("MetaMask is not installed.");
+    }
+    this.provider = new ethers.providers.Web3Provider(window.ethereum);
+  }
+
+  async connect() {
+    if (!this.provider) await this.init();
+
+    const network = await this.provider.getNetwork();
+    if (!this.supportedNetworks[network.chainId]) {
+      throw new Error(
+        `Unsupported Network (ChainID: ${network.chainId}). Switch to Sepolia, Holesky, or Local.`
+      );
     }
 
-    async init() {
-        if (typeof window === 'undefined' || !window.ethereum) {
-            throw new Error("Web3 provider not found. Please install MetaMask.");
-        }
-        if (typeof ethers === 'undefined') {
-            throw new Error("Ethers.js library not loaded.");
-        }
-        this.provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await this.provider.send("eth_requestAccounts", []);
+    this.signer = this.provider.getSigner();
+
+    this.tokenContract = new ethers.Contract(this.tokenAddr, this.tokenAbi, this.signer);
+
+    if (this.crowdAddr && this.crowdAbi && this.crowdAbi.length) {
+      this.crowdContract = new ethers.Contract(this.crowdAddr, this.crowdAbi, this.signer);
     }
 
-    async connect() {
-        if (!this.provider) await this.init();
-        await this.provider.send("eth_requestAccounts", []);
-        this.signer = this.provider.getSigner();
-        this.contract = new ethers.Contract(this.contractAddress, this.abi, this.signer);
-        return await this.signer.getAddress();
+    return {
+      address: accounts[0],
+      chainId: network.chainId,
+      networkName: this.supportedNetworks[network.chainId],
+      explorerUrl: this.getExplorerUrl(network.chainId)
+    };
+  }
+
+  getExplorerUrl(chainId) {
+    if (chainId === 11155111) return "https://sepolia.etherscan.io";
+    if (chainId === 17000) return "https://holesky.etherscan.io";
+    return "";
+  }
+
+  async getTokenBalance(address) {
+    if (!this.tokenContract) throw new Error("Not connected");
+    const balance = await this.tokenContract.balanceOf(address);
+    return ethers.utils.formatEther(balance);
+  }
+
+  async transferTokens(to, amount) {
+    if (!this.tokenContract) throw new Error("Not connected");
+    const tx = await this.tokenContract.transfer(
+      to,
+      ethers.utils.parseEther(amount.toString())
+    );
+    return tx;
+  }
+
+  setupListeners(onContribution, onTransfer) {
+    if (this.crowdContract && onContribution) {
+      this.crowdContract.on("ContributionMade", (id, contributor, amount) => {
+        onContribution(id.toNumber(), contributor, ethers.utils.formatEther(amount));
+      });
     }
 
-    async sendTokens(to, amount) {
-        try {
-            if (!this.contract) throw new Error("Contract not initialized. Connect wallet first.");
-            if (!ethers.utils.isAddress(to)) {
-                throw new Error("Invalid recipient address");
-            }
-            const amountInWei = ethers.utils.parseEther(amount.toString());
-            const tx = await this.contract.transfer(to, amountInWei);
-            return await tx.wait();
-        } catch (error) {
-            console.error("Transaction failed:", error);
-            throw error;
-        }
+    if (this.tokenContract && onTransfer) {
+      this.tokenContract.on("Transfer", (from, to, amount) => {
+        onTransfer(from, to, ethers.utils.formatEther(amount));
+      });
     }
+  }
 
-    async getBalance(address) {
-        try {
-            if (!this.contract) throw new Error("Contract not initialized.");
-            const balance = await this.contract.balanceOf(address);
-            return ethers.utils.formatEther(balance);
-        } catch (error) {
-            console.error("Failed to fetch balance:", error);
-            throw error;
-        }
-    }
+  async estimateTransferGas(to, amount) {
+    if (!this.signer || !this.tokenContract) throw new Error("Not connected");
+    const wei = ethers.utils.parseEther(amount.toString());
+    const est = await this.tokenContract.estimateGas.transfer(to, wei);
+    return est.toNumber();
+  }
 
-    async onTransfer(callback) {
-        if (!this.contract) return;
-        this.contract.on("Transfer", (from, to, value) => {
-            callback(from, to, ethers.utils.formatEther(value));
-        });
-    }
+  async getBalance(addr) {
+    return await this.getTokenBalance(addr);
+  }
 
-    async estimateGas(to, amount) {
-        if (!this.contract) throw new Error("Contract not initialized.");
-        try {
-            const amountInWei = ethers.utils.parseEther(amount.toString());
-            const estimate = await this.contract.estimateGas.transfer(to, amountInWei);
-            return estimate.toString();
-        } catch (error) {
-            throw error;
-        }
-    }
+  async sendTokens(to, amount) {
+    const tx = await this.transferTokens(to, amount);
+    await tx.wait();
+    return tx;
+  }
 
-    async estimateFailingGas(to, amount) {
-        if (!this.contract) throw new Error("Contract not initialized.");
-        try {
-            const amountInWei = ethers.utils.parseEther(amount.toString());
-            await this.contract.estimateGas.transfer(to, amountInWei);
-        } catch (error) {
-            if (error.error && error.error.data) {
-                return "Fail detected: " + error.error.message;
-            }
-            return error.message;
-        }
-    }
+  onTransfer(cb) {
+    this.setupListeners(null, cb);
+  }
+
+  async estimateGas(to, amount) {
+    return await this.estimateTransferGas(to, amount);
+  }
 }
