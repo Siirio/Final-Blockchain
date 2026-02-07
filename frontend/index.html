@@ -1,104 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RNT Token System</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNT corp | Decentralized Crowdfunding</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Space+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </head>
 
 <body>
-  <div class="navbar">
-    <div class="logo">RNT <span>Token System</span></div>
+    <div class="structural-line line-v" style="left: 4rem;"></div>
+    <div class="structural-line line-v" style="left: calc(4rem + 350px);"></div>
 
-    <div class="nav-right">
-      <div class="network-badge" id="networkBadge">NETWORK: -</div>
-      <button class="btn-glass btn-primary" id="connectBtn">Connect Wallet</button>
-    </div>
-  </div>
-
-  <div class="app-wrapper">
-    <div class="sidebar">
-      <div class="corp-info">
-        <h1>RNT CORP</h1>
-        <div style="font-size:1.2rem; font-weight:700;">Token Dashboard</div>
-      </div>
-
-      <div class="user-status">
-        <div class="address-block" id="addressBlock">Address: -</div>
-
-        <div class="balance-item">
-          <label>RNT Balance</label>
-          <div class="value" id="balanceValue">-</div>
+    <nav class="navbar">
+        <div class="logo">RNT<span>corp</span></div>
+        <div class="nav-right">
+            <div id="networkStatus" class="network-badge">SYSTEM // IDLE</div>
+            <button id="connectBtn" class="btn-glass btn-primary">INITIATE PROTOCOL</button>
         </div>
+    </nav>
 
-        <div class="balance-item">
-          <label>Status</label>
-          <div class="value" style="font-size:0.9rem; color: var(--text-muted);" id="status">
-            Disconnected
-          </div>
-        </div>
-      </div>
-
-      <ul class="nav-menu">
-        <li class="active" data-target="tokenSection">Token Transfer</li>
-        <li data-target="crowdSection">Crowdfunding</li>
-      </ul>
-    </div>
-
-    <div class="content-area">
-
-      <div class="section active" id="tokenSection">
-        <div class="section-header">
-          <h2>Transfer</h2>
-        </div>
-
-        <div class="brutalist-card">
-          <div class="input-container">
-            <label>Recipient Address</label>
-            <input type="text" id="toAddr" placeholder="0x..." />
-          </div>
-
-          <div class="input-container">
-            <label>Amount (RNT)</label>
-            <input type="number" id="amount" placeholder="e.g. 10" />
-          </div>
-
-          <button class="btn-glass btn-primary w-100" id="sendBtn" disabled>
-            Send RNT
-          </button>
-
-          <div class="mt-2" style="border-top:1px solid var(--border); padding-top:1.5rem;">
-            <div class="balance-item">
-              <label>Estimated Gas</label>
-              <div class="value" style="font-size:0.9rem;" id="gasEstimate">-</div>
+    <main class="app-wrapper">
+        <!-- Dashboard Sidebar -->
+        <aside class="sidebar">
+            <div class="corp-info">
+                <h1>Autonomous Node<br>Control Center</h1>
             </div>
 
-            <div style="margin-top:0.75rem; color: var(--text-muted); font-size:0.85rem;" id="gasStatus"></div>
-          </div>
-        </div>
-      </div>
+            <div class="user-status">
+                <div class="address-block" id="userAddress">0x...</div>
 
-      <div class="section" id="crowdSection">
-        <div class="section-header">
-          <h2>Crowdfunding</h2>
-        </div>
+                <div class="balance-item">
+                    <label>RNT Liquidity</label>
+                    <div class="value" id="rntBalance">0.00</div>
+                </div>
+                <div class="balance-item">
+                    <label>ETH Reserves</label>
+                    <div class="value" id="ethBalance">0.0000</div>
+                </div>
+            </div>
 
-        <div class="brutalist-card">
-          <div style="color: var(--text-muted); line-height: 1.6;">
-            This section is ready for campaigns UI (create / list / contribute / finalize).
-            <br/>We’ll connect it after token transfer works.
-          </div>
-        </div>
-      </div>
+            <ul class="nav-menu nav-links">
+                <li class="active" data-section="token-section">Asset Transfer</li>
+                <li data-section="crowd-section">Project Funding</li>
+            </ul>
+        </aside>
 
+        <!-- Main Content Sections -->
+        <section class="content-area">
+            <!-- Token Section -->
+            <div id="token-section" class="section active">
+                <div class="section-header">
+                    <h2>Asset Allocation</h2>
+                </div>
+
+                <div class="brutalist-card">
+                    <div class="input-container">
+                        <label>Target Identity (Address)</label>
+                        <input type="text" id="transferTo" placeholder="0x...">
+                    </div>
+                    <div class="input-container">
+                        <label>Transfer Magnitude (RNT)</label>
+                        <input type="number" id="transferAmount" placeholder="0.0">
+                    </div>
+                    <button id="transferBtn" class="btn-glass w-100">EXECUTE TRANSFER</button>
+                </div>
+            </div>
+
+            <!-- Crowdfunding Section -->
+            <div id="crowd-section" class="section">
+                <div class="section-header">
+                    <h2>Active Operations</h2>
+                    <button id="openCreateModal" class="btn-glass">+ BOOT NODE</button>
+                </div>
+
+                <div id="campaignList" class="campaign-grid">
+                    <div class="loader">ACCESSING REPOSITORY...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Create Campaign Modal -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Boot New Node</h3>
+                <button id="closeModal"
+                    style="background:none; border:none; color:white; font-size:2rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-container">
+                    <label>Operation Designation</label>
+                    <input type="text" id="newTitle" placeholder="NODE_ID_ALPHA">
+                </div>
+                <div class="input-container">
+                    <label>Capital Requirement (ETH)</label>
+                    <input type="number" id="newGoal" placeholder="1.0">
+                </div>
+                <div class="input-container">
+                    <label>Operational Window (MIN)</label>
+                    <input type="number" id="newDuration" placeholder="60">
+                </div>
+                <button id="createCampaignBtn" class="btn-glass btn-primary w-100 mt-2">DEPLOY TO MAINNET</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div class="toast" id="toast"></div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
 
-  <script type="module" src="ui.js"></script>
+    <script type="module" src="ui.js"></script>
 </body>
+
 </html>

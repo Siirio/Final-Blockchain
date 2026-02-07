@@ -11,6 +11,7 @@
     --glass-hover: rgba(255, 255, 255, 0.07);
     --primary: #ffffff;
     --accent: #222222;
+    --danger: #ff0000;
 }
 
 * {
@@ -31,6 +32,7 @@ body {
     background-size: 50px 50px;
 }
 
+/* Structural Elements */
 .structural-line {
     position: fixed;
     background: var(--border);
@@ -49,6 +51,7 @@ body {
     left: 0;
 }
 
+/* Navigation */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -91,6 +94,7 @@ body {
     text-transform: uppercase;
 }
 
+/* Layout */
 .app-wrapper {
     max-width: 1600px;
     margin: 0 auto;
@@ -100,6 +104,7 @@ body {
     gap: 4rem;
 }
 
+/* Sidebar */
 .sidebar {
     display: flex;
     flex-direction: column;
@@ -183,6 +188,7 @@ body {
     background: var(--glass-hover);
 }
 
+/* Content Area */
 .content-area {
     display: flex;
     flex-direction: column;
@@ -224,6 +230,7 @@ body {
     letter-spacing: -1px;
 }
 
+/* Cards & Forms */
 .brutalist-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -260,6 +267,7 @@ input:focus {
     border-bottom: 1px solid var(--primary);
 }
 
+/* Buttons */
 .btn-glass {
     background: var(--glass);
     border: 1px solid var(--border);
@@ -294,6 +302,7 @@ input:focus {
     color: var(--primary);
 }
 
+/* Campaign Grid */
 .campaign-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -363,6 +372,7 @@ input:focus {
     padding: 0.5rem 0;
 }
 
+/* Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -393,6 +403,7 @@ input:focus {
     text-transform: uppercase;
 }
 
+/* Toast */
 .toast {
     position: fixed;
     bottom: 3rem;
@@ -412,6 +423,7 @@ input:focus {
     transform: translateY(0);
 }
 
+/* Utlities */
 .w-100 {
     width: 100%;
 }
@@ -420,5 +432,12 @@ input:focus {
     margin-top: 2rem;
 }
 
-.w-100 { width: 100%; }
-.mt-2 { margin-top: 2rem; }
+.loader {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
