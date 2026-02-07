@@ -230,7 +230,6 @@ body {
     letter-spacing: -1px;
 }
 
-/* Cards & Forms */
 .brutalist-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -267,7 +266,6 @@ input:focus {
     border-bottom: 1px solid var(--primary);
 }
 
-/* Buttons */
 .btn-glass {
     background: var(--glass);
     border: 1px solid var(--border);
@@ -302,7 +300,6 @@ input:focus {
     color: var(--primary);
 }
 
-/* Campaign Grid */
 .campaign-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -324,15 +321,30 @@ input:focus {
     font-family: 'Space Mono', monospace;
     font-size: 0.7rem;
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     display: flex;
     justify-content: space-between;
 }
 
+.campaign-body {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.project-icon {
+    width: 60px;
+    height: 60px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
 .campaign-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
+    font-size: 1.4rem;
     text-transform: uppercase;
+    letter-spacing: -0.5px;
+    word-break: break-all;
 }
 
 .progress-container {
@@ -372,7 +384,6 @@ input:focus {
     padding: 0.5rem 0;
 }
 
-/* Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -403,7 +414,6 @@ input:focus {
     text-transform: uppercase;
 }
 
-/* Toast */
 .toast {
     position: fixed;
     bottom: 3rem;
@@ -423,7 +433,6 @@ input:focus {
     transform: translateY(0);
 }
 
-/* Utlities */
 .w-100 {
     width: 100%;
 }

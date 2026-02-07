@@ -7,7 +7,6 @@ class UIManager {
         this.userAddress = null;
         this.explorerUrl = "";
 
-        // Elements
         this.connectBtn = document.getElementById('connectBtn');
         this.rntBalanceEl = document.getElementById('rntBalance');
         this.ethBalanceEl = document.getElementById('ethBalance');
@@ -18,11 +17,9 @@ class UIManager {
         this.createCampaignBtn = document.getElementById('createCampaignBtn');
         this.toastEl = document.getElementById('toast');
 
-        // Navigation
         this.navLinks = document.querySelectorAll('.nav-links li');
         this.sections = document.querySelectorAll('.section');
 
-        // Modal
         this.modalOverlay = document.getElementById('modalOverlay');
         this.openCreateModalBtn = document.getElementById('openCreateModal');
         this.closeModalBtn = document.getElementById('closeModal');
@@ -107,6 +104,10 @@ class UIManager {
 
     setupBlockchainListeners() {
         this.blockchain.setupListeners(
+            (id, title, goal) => {
+                this.showToast(`New Node Booted: ${title} (#${id})`);
+                this.loadCampaigns();
+            },
             (id, contributor, amount) => {
                 this.showToast(`Contribution detected: ${amount} ETH to Node #${id}`);
                 this.loadCampaigns();
@@ -201,12 +202,20 @@ class UIManager {
         const progress = (parseFloat(c.totalRaised) / parseFloat(c.goal)) * 100;
         const isEnded = Date.now() / 1000 > c.deadline;
 
+        const hue = (c.id * 137.5) % 360;
+        const iconStyle = `background: linear-gradient(135deg, hsl(${hue}, 50%, 40%), hsl(${hue + 40}, 50%, 20%));`;
+
         card.innerHTML = `
             <div class="campaign-meta">
                 <span>NODE #${c.id}</span>
                 <span>${isEnded ? 'OFFLINE' : 'OPERATIONAL'}</span>
             </div>
-            <h3>${c.title}</h3>
+            <div class="campaign-body">
+                <div class="project-icon" style="${iconStyle}"></div>
+                <div class="project-info">
+                    <h3>${c.title}</h3>
+                </div>
+            </div>
             <div class="progress-container">
                 <div class="progress-bar"><div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div></div>
             </div>

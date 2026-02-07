@@ -16,11 +16,11 @@ export const TOKEN_ABI = [
 
 export const CROWDFUNDING_ABI = [
   "function campaignCount() view returns (uint256)",
-  "function campaigns(uint256) view returns (uint256, string, uint256, uint256, address, uint256, bool)",
+  "function campaigns(uint256) view returns (uint256 id, string title, uint256 goal, uint256 deadline, address creator, uint256 totalRaised, bool finalized)",
   "function createCampaign(string, uint256, uint256)",
   "function contribute(uint256) payable",
   "function finalizeCampaign(uint256)",
-  "function getCampaign(uint256) view returns (uint256, string, uint256, uint256, address, uint256, bool)",
+  "function getCampaign(uint256) view returns (uint256 id, string title, uint256 goal, uint256 deadline, address creator, uint256 totalRaised, bool finalized)",
   "function contributions(uint256, address) view returns (uint256)",
   "event CampaignCreated(uint256 id, string title, uint256 goal, uint256 deadline, address creator)",
   "event ContributionMade(uint256 campaignId, address contributor, uint256 amount)",

@@ -9,7 +9,6 @@ export class BlockchainService {
         this.tokenContract = null;
         this.crowdContract = null;
 
-        // Supported Networks
         this.supportedNetworks = {
             11155111: "Sepolia",
             17000: "Holesky",
@@ -27,7 +26,6 @@ export class BlockchainService {
     async connect() {
         if (!this.provider) await this.init();
 
-        // Network Validation
         const network = await this.provider.getNetwork();
         if (!this.supportedNetworks[network.chainId]) {
             throw new Error(`Unsupported Network (ChainID: ${network.chainId}). Please switch to Sepolia, Holesky, or Local.`);
@@ -48,10 +46,9 @@ export class BlockchainService {
     getExplorerUrl(chainId) {
         if (chainId === 11155111) return "https://sepolia.etherscan.io";
         if (chainId === 17000) return "https://holesky.etherscan.io";
-        return ""; // Local
+        return ""; 
     }
 
-    // --- Token Methods ---
     async getTokenBalance(address) {
         if (!this.tokenContract) throw new Error("Not connected");
         const balance = await this.tokenContract.balanceOf(address);
@@ -64,7 +61,6 @@ export class BlockchainService {
         return tx;
     }
 
-    // --- Crowdfunding Methods ---
     async getCampaignCount() {
         if (!this.crowdContract) throw new Error("Not connected");
         const count = await this.crowdContract.campaignCount();
@@ -106,9 +102,12 @@ export class BlockchainService {
         return tx;
     }
 
-    // --- Listeners ---
-    setupListeners(onContribution, onTransfer) {
+    setupListeners(onCampaignCreated, onContribution, onTransfer) {
         if (!this.crowdContract || !this.tokenContract) return;
+
+        this.crowdContract.on("CampaignCreated", (id, title, goal, deadline, creator) => {
+            onCampaignCreated(id.toNumber(), title, ethers.utils.formatEther(goal));
+        });
 
         this.crowdContract.on("ContributionMade", (id, contributor, amount) => {
             onContribution(id.toNumber(), contributor, ethers.utils.formatEther(amount));

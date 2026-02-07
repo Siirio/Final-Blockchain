@@ -5,12 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RNT corp | Decentralized Crowdfunding</title>
-    <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Space+Mono&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Ethers.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 </head>
 
@@ -27,7 +25,6 @@
     </nav>
 
     <main class="app-wrapper">
-        <!-- Dashboard Sidebar -->
         <aside class="sidebar">
             <div class="corp-info">
                 <h1>Autonomous Node<br>Control Center</h1>
@@ -52,9 +49,7 @@
             </ul>
         </aside>
 
-        <!-- Main Content Sections -->
         <section class="content-area">
-            <!-- Token Section -->
             <div id="token-section" class="section active">
                 <div class="section-header">
                     <h2>Asset Allocation</h2>
@@ -73,7 +68,6 @@
                 </div>
             </div>
 
-            <!-- Crowdfunding Section -->
             <div id="crowd-section" class="section">
                 <div class="section-header">
                     <h2>Active Operations</h2>
@@ -87,7 +81,6 @@
         </section>
     </main>
 
-    <!-- Create Campaign Modal -->
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
@@ -113,7 +106,6 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
     <script type="module" src="ui.js"></script>
